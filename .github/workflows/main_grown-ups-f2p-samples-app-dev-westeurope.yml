@@ -17,13 +17,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./dist/* -r
+        run: zip webgl-urp-2d-sample.zip ./webgl-urp-2d-sample/dist/* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: release.zip
+          path: webgl-urp-2d-sample.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
           name: node-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        run: unzip webgl-urp-2d-sample.zip
 
       - name: Login to Azure
         uses: azure/login@v1
