@@ -1,0 +1,6 @@
+{
+  "cSpell.words": ["Behaviour", "gucustomerslocal", "msal"],
+  "files.associations": {
+    "*.jslib": "javascript"
+  }
+}
