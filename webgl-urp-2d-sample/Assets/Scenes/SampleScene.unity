@@ -952,7 +952,7 @@ GameObject:
   - component: {fileID: 1549325457}
   - component: {fileID: 1549325456}
   m_Layer: 0
-  m_Name: MsalAuthenticator
+  m_Name: WebGlAuthenticator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

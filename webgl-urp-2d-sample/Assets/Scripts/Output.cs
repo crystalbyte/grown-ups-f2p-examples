@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -16,8 +17,9 @@ namespace GrownUps
 
         public void WriteLine(string text, Color? color = null)
         {
+            var time = DateTime.Now;
             color ??= Color.white;
-            input.text += $"<color=#{ColorUtility.ToHtmlStringRGB(color.Value)}>{text}</color><br>";
+            input.text += $"<color=#{ColorUtility.ToHtmlStringRGB(color.Value)}>[{time}] {text}</color><br>";
         }
     }
 }
