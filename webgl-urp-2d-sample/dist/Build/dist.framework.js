@@ -1975,13 +1975,13 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  3893820: function() {Module['emscripten_get_now_backup'] = performance.now;},  
- 3893875: function($0) {performance.now = function() { return $0; };},  
- 3893923: function($0) {performance.now = function() { return $0; };},  
- 3893971: function() {performance.now = Module['emscripten_get_now_backup'];},  
- 3894026: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
- 3894087: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
- 3894151: function() {return Module.webglContextAttributes.powerPreference;}
+  3893852: function() {Module['emscripten_get_now_backup'] = performance.now;},  
+ 3893907: function($0) {performance.now = function() { return $0; };},  
+ 3893955: function($0) {performance.now = function() { return $0; };},  
+ 3894003: function() {performance.now = Module['emscripten_get_now_backup'];},  
+ 3894058: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
+ 3894119: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
+ 3894183: function() {return Module.webglContextAttributes.powerPreference;}
 };
 
 
@@ -4386,13 +4386,53 @@ var ASM_CONSTS = {
   	return !!Module.shouldQuit;
   }
 
-  function _RequestUserToken() {
+  function _SignIn() {
       try {
-        if (windows.self === window.top) {
-          throw new Error("Grown Ups parent page not found.");
-        }
+        console.log("SignIn called ...");
+        console.log("Fetching msal script ...");
+        var msal = document.createElement("script");
+        msal.onload = function () {
+          console.log("Script successfully fetched.");
+  
+          const tenantName = "gucustomerslocal";
+          const policy = "B2C_1A_GrownUps_SignUpSignIn";
+          const msalInstance = new msal.PublicClientApplication({
+            auth: {
+              clientId: "f02d23eb-1fa0-4ada-ae0e-f4c88877b252",
+              authority: `https://${tenantName}.b2clogin.com/${tenantName}.onmicrosoft.com/${policy}`,
+              redirectUri: "/", // set to a blank page for handling auth code response via popups
+            },
+            cache: {
+              cacheLocation: "localStorage", // set your cache location to local storage
+            },
+          });
+  
+          console.log("MSAL instance successfully created.");
+  
+          window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sid = urlParams.get("sid");
+  
+            console.log("Attempting silent authentication ...");
+            msalInstance
+              .ssoSilent({
+                sid: sid,
+              })
+              .then((response) => {
+                console.log("Sign In successfully completed.");
+                SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
+              })
+              .catch((e) => {
+                console.log("Sign In failed. " + e);
+                SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
+              });
+          };
+        };
+  
+        msal.src = "https://cdn2.grown-ups.net/auth/msal-browser.min.js";
       } catch (e) {
-        MyGameInstance.SendMessage("GrownUpsAuthReceiver", "OnError", e.message);
+        console.log("Sign In failed. " + e);
+        SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
       }
     }
 
@@ -15002,7 +15042,7 @@ var asmLibraryArg = {
   "JS_SystemInfo_HasWebGL": _JS_SystemInfo_HasWebGL,
   "JS_SystemInfo_IsMobile": _JS_SystemInfo_IsMobile,
   "JS_UnityEngineShouldQuit": _JS_UnityEngineShouldQuit,
-  "RequestUserToken": _RequestUserToken,
+  "SignIn": _SignIn,
   "__assert_fail": ___assert_fail,
   "__cxa_allocate_exception": ___cxa_allocate_exception,
   "__cxa_begin_catch": ___cxa_begin_catch,
