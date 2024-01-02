@@ -1975,13 +1975,13 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  3893852: function() {Module['emscripten_get_now_backup'] = performance.now;},  
- 3893907: function($0) {performance.now = function() { return $0; };},  
- 3893955: function($0) {performance.now = function() { return $0; };},  
- 3894003: function() {performance.now = Module['emscripten_get_now_backup'];},  
- 3894058: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
- 3894119: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
- 3894183: function() {return Module.webglContextAttributes.powerPreference;}
+  3893868: function() {Module['emscripten_get_now_backup'] = performance.now;},  
+ 3893923: function($0) {performance.now = function() { return $0; };},  
+ 3893971: function($0) {performance.now = function() { return $0; };},  
+ 3894019: function() {performance.now = Module['emscripten_get_now_backup'];},  
+ 3894074: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
+ 3894135: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
+ 3894199: function() {return Module.webglContextAttributes.powerPreference;}
 };
 
 
@@ -4390,8 +4390,14 @@ var ASM_CONSTS = {
       try {
         console.log("SignIn called ...");
         console.log("Fetching msal script ...");
-        var msal = document.createElement("script");
-        msal.onload = function () {
+  
+        let msalScript = document.createElement("script");
+        msalScript.setAttribute(
+          "src",
+          "https://cdn2.grown-ups.net/auth/msal-browser.min.js"
+        );
+        msalScript.setAttribute("async", true);
+        msalScript.addEventListener("load", () => {
           console.log("Script successfully fetched.");
   
           const tenantName = "gucustomerslocal";
@@ -4407,29 +4413,30 @@ var ASM_CONSTS = {
             },
           });
   
-          console.log("MSAL instance successfully created.");
+          const urlParams = new URLSearchParams(window.location.search);
+          const sid = urlParams.get("sid");
   
-          window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sid = urlParams.get("sid");
+          console.log("Attempting silent authentication ...");
+          msalInstance
+            .ssoSilent({
+              sid: sid,
+            })
+            .then((response) => {
+              // console.log("Sign In successfully completed.");
+              SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
+            })
+            .catch((e) => {
+              console.log("Sign In failed. " + e);
+              SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
+            });
+        });
   
-            console.log("Attempting silent authentication ...");
-            msalInstance
-              .ssoSilent({
-                sid: sid,
-              })
-              .then((response) => {
-                console.log("Sign In successfully completed.");
-                SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
-              })
-              .catch((e) => {
-                console.log("Sign In failed. " + e);
-                SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
-              });
-          };
-        };
+        msalScript.addEventListener("error", (e) => {
+          console.error(e);
+        });
   
-        msal.src = "https://cdn2.grown-ups.net/auth/msal-browser.min.js";
+        console.log("Adding script ...");
+        document.body.appendChild(msalScript);
       } catch (e) {
         console.log("Sign In failed. " + e);
         SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());

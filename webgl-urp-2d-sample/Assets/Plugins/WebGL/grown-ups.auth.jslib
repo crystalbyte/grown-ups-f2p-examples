@@ -3,8 +3,14 @@ mergeInto(LibraryManager.library, {
     try {
       console.log("SignIn called ...");
       console.log("Fetching msal script ...");
-      var msal = document.createElement("script");
-      msal.onload = function () {
+
+      let msalScript = document.createElement("script");
+      msalScript.setAttribute(
+        "src",
+        "https://cdn2.grown-ups.net/auth/msal-browser.min.js"
+      );
+      msalScript.setAttribute("async", true);
+      msalScript.addEventListener("load", () => {
         console.log("Script successfully fetched.");
 
         const tenantName = "gucustomerslocal";
@@ -20,29 +26,30 @@ mergeInto(LibraryManager.library, {
           },
         });
 
-        console.log("MSAL instance successfully created.");
+        const urlParams = new URLSearchParams(window.location.search);
+        const sid = urlParams.get("sid");
 
-        window.onload = () => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const sid = urlParams.get("sid");
+        console.log("Attempting silent authentication ...");
+        msalInstance
+          .ssoSilent({
+            sid: sid,
+          })
+          .then((response) => {
+            // console.log("Sign In successfully completed.");
+            SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
+          })
+          .catch((e) => {
+            console.log("Sign In failed. " + e);
+            SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
+          });
+      });
 
-          console.log("Attempting silent authentication ...");
-          msalInstance
-            .ssoSilent({
-              sid: sid,
-            })
-            .then((response) => {
-              console.log("Sign In successfully completed.");
-              SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
-            })
-            .catch((e) => {
-              console.log("Sign In failed. " + e);
-              SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
-            });
-        };
-      };
+      msalScript.addEventListener("error", (e) => {
+        console.error(e);
+      });
 
-      msal.src = "https://cdn2.grown-ups.net/auth/msal-browser.min.js";
+      console.log("Adding script ...");
+      document.body.appendChild(msalScript);
     } catch (e) {
       console.log("Sign In failed. " + e);
       SendMessage("WebGlAuthenticator", "SignInFailed", e.ToString());
