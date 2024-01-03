@@ -1,17 +1,13 @@
 mergeInto(LibraryManager.library, {
   SignIn: function () {
     try {
-      console.log("SignIn called ...");
-      console.log("Fetching msal script ...");
+      console.log("Attempting to sign in ...");
 
       let msalScript = document.createElement("script");
-      msalScript.setAttribute(
-        "src",
-        "https://cdn2.grown-ups.net/auth/msal-browser.min.js"
-      );
-      msalScript.setAttribute("async", true);
+      msalScript.src = "https://cdn2.grown-ups.net/auth/msal-browser.min.js";
+      msalScript.async = true;
       msalScript.addEventListener("load", () => {
-        console.log("Script successfully fetched.");
+        console.log("Script successfully loaded.");
 
         const tenantName = "gucustomerslocal";
         const policy = "B2C_1A_GrownUps_SignUpSignIn";
@@ -27,15 +23,19 @@ mergeInto(LibraryManager.library, {
         });
 
         const urlParams = new URLSearchParams(window.location.search);
-        const sid = urlParams.get("sid");
+        const hint = urlParams.get("login_hint");
+        if (!hint) {
+          console.error("No login hint provided");
+          return;
+        }
 
         console.log("Attempting silent authentication ...");
         msalInstance
           .ssoSilent({
-            sid: sid,
+            loginHint: hint,
           })
           .then((response) => {
-            // console.log("Sign In successfully completed.");
+            console.log("Sign In successfully completed.");
             SendMessage("WebGlAuthenticator", "SignInSucceeded", response);
           })
           .catch((e) => {
@@ -48,7 +48,6 @@ mergeInto(LibraryManager.library, {
         console.error(e);
       });
 
-      console.log("Adding script ...");
       document.body.appendChild(msalScript);
     } catch (e) {
       console.log("Sign In failed. " + e);
