@@ -1,37 +1,48 @@
 using System;
+using System.Text;
+using System.Linq;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.IdentityModel.Tokens.Jwt;
 using UnityEngine;
 
 namespace GrownUps
 {
     public sealed class WebGlAuthenticator : MonoBehaviour
     {
-        public WebGlAuthenticator()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-        }
+        private static Color mintGreen = new Color(105 / 255.0f, 240 / 255.0f, 174 / 255.0f);
+        private static Color tomatoRed = new Color(255 / 255.0f, 99 / 255.0f, 71 / 255.0f);
 
         public Output Output;
-        public static WebGlAuthenticator Instance;
 
         public void Start()
         {
             JsMethods.RequestAuthToken();
         }
 
-        public static void RequestSucceeded(string token)
+        public void OnRequestSucceeded(string jwt)
         {
-            Instance.Output.WriteLine($"<color=#69f0ae>Sign in successful. <br>{token}</color>");
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(jwt);
+
+                Output.WriteLine($"Token successfully acquired.", mintGreen);
+
+                var claim = token.Claims.First(x => x.Type == "name");
+                Output.WriteLine($"Welcome {claim.Value}");
+            }
+            catch (Exception e)
+            {
+                Output.WriteLine(e.Message, tomatoRed);
+            }
+
         }
 
-        public static void RequestFailed(string error)
+        public void OnRequestFailed(string error)
         {
-            Instance.Output.WriteLine($"<color=red>Error: {error}</color>");
+            Output.WriteLine(error, tomatoRed);
         }
 
         private class JsMethods

@@ -19,7 +19,8 @@ namespace GrownUps
         {
             var time = DateTime.Now;
             color ??= Color.white;
-            input.text += $"<color=#{ColorUtility.ToHtmlStringRGB(color.Value)}>[{time}] {text}</color><br>";
+            var hex = ColorUtility.ToHtmlStringRGB(color.Value);
+            input.text += $"<color=#{hex}>[{time}] {text}</color><br>";
         }
     }
 }

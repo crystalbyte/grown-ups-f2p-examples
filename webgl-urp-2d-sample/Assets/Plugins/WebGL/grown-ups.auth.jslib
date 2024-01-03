@@ -1,12 +1,16 @@
 mergeInto(LibraryManager.library, {
   RequestAuthToken: function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idToken = urlParams.get("id_token");
-    if (!idToken) {
-      throw new Error("Id token not found in query string.");
-    }
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const accessToken = urlParams.get("access_token");
+      if (!accessToken) {
+        throw new Error("Access token not found in query string.");
+      }
 
-    SendMessage("WebGlAuthenticator", "RequestSucceeded", idToken);
+      SendMessage("WebGlAuthenticator", "OnRequestSucceeded", accessToken);
+    } catch (e) {
+      SendMessage("WebGlAuthenticator", "OnRequestFailed", e.message);
+    }
   },
   SignIn: function () {
     try {
