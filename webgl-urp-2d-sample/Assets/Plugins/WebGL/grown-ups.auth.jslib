@@ -1,4 +1,13 @@
 mergeInto(LibraryManager.library, {
+  RequestAuthToken: function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idToken = urlParams.get("id_token");
+    if (!idToken) {
+      throw new Error("Id token not found in query string.");
+    }
+
+    SendMessage("WebGlAuthenticator", "RequestSucceeded", idToken);
+  },
   SignIn: function () {
     try {
       console.log("Attempting to sign in ...");

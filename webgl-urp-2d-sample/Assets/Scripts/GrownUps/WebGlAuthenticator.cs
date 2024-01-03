@@ -21,15 +21,15 @@ namespace GrownUps
 
         public void Start()
         {
-            JsMethods.SignIn();
+            JsMethods.RequestAuthToken();
         }
 
-        public static void SignInSucceeded(string token)
+        public static void RequestSucceeded(string token)
         {
             Instance.Output.WriteLine($"<color=#69f0ae>Sign in successful. <br>{token}</color>");
         }
 
-        public static void SignInFailed(string error)
+        public static void RequestFailed(string error)
         {
             Instance.Output.WriteLine($"<color=red>Error: {error}</color>");
         }
@@ -38,6 +38,9 @@ namespace GrownUps
         {
             [DllImport("__Internal")]
             public static extern string SignIn();
+
+            [DllImport("__Internal")]
+            public static extern string RequestAuthToken();
         }
     }
 }
