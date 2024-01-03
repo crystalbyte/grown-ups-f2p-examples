@@ -15,7 +15,7 @@ mergeInto(LibraryManager.library, {
           auth: {
             clientId: "f02d23eb-1fa0-4ada-ae0e-f4c88877b252",
             authority: `https://${tenantName}.b2clogin.com/${tenantName}.onmicrosoft.com/${policy}`,
-            redirectUri: "/", // set to a blank page for handling auth code response via popups
+            redirectUri: "about:blank", // set to a blank page for handling auth code response via popups
           },
           cache: {
             cacheLocation: "localStorage", // set your cache location to local storage
@@ -23,6 +23,7 @@ mergeInto(LibraryManager.library, {
         });
 
         const urlParams = new URLSearchParams(window.location.search);
+        const scopes = ["openid", "offline_access", "email"];
         const hint = urlParams.get("login_hint");
         if (!hint) {
           console.error("No login hint provided");
@@ -32,6 +33,7 @@ mergeInto(LibraryManager.library, {
         console.log("Attempting silent authentication ...");
         msalInstance
           .ssoSilent({
+            scopes,
             loginHint: hint,
           })
           .then((response) => {
