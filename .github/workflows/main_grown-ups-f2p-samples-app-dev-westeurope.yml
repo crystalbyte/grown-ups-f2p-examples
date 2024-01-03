@@ -61,11 +61,8 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip webgl-urp-2d-sample.zip -d webgl-urp-2d-sample
 
-      - name: Create server dir
-        run: mkdir -p server
-
       - name: Unzip artifact for deployment
-        run: unzip server.zip -d server
+        run: unzip server.zip
 
       - name: Remove artifact
         run: rm webgl-urp-2d-sample.zip
