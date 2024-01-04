@@ -5,6 +5,10 @@ const PORT = env.process.PORT || 3000;
 const app = express();
 app.enableCors();
 
+app.get("/health", function (_req, res) {
+  res.send(42);
+});
+
 const routes = ["webgl-urp-2d-sample"];
 for (const route of routes) {
   app.use(
