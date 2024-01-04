@@ -13,7 +13,6 @@ app.get("/health", function (_req, res) {
 const routes = ["webgl-urp-2d-sample"];
 for (const route of routes) {
   app.use(
-    route,
     express.static(`/${route}`, path.join(__dirname, route), {
       cacheControl: "no-cache",
     })
