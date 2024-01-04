@@ -1,9 +1,10 @@
 const express = require("express");
+const cors = require("cors");
 const path = require("path");
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-app.enableCors();
+app.use(cors());
 
 app.get("/health", function (_req, res) {
   res.send(42);
