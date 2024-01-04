@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 
 app.get("/health", function (_req, res) {
-  res.send(42);
+  res.sendStatus(200);
 });
 
 const routes = ["webgl-urp-2d-sample"];
